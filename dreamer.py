@@ -4,23 +4,17 @@ import os
 import pathlib
 import sys
 
-os.environ["MUJOCO_GL"] = "osmesa"
-
 import numpy as np
 import ruamel.yaml as yaml
+import torch
+from torch import distributions as torchd
+from torch import nn
 
-sys.path.append(str(pathlib.Path(__file__).parent))
-
+import envs.wrappers as wrappers
 import exploration as expl
 import models
 import tools
-import envs.wrappers as wrappers
-from parallel import Parallel, Damy
-
-import torch
-from torch import nn
-from torch import distributions as torchd
-
+from parallel import Damy, Parallel
 
 to_np = lambda x: x.detach().cpu().numpy()
 
@@ -127,7 +121,7 @@ class Dreamer(nn.Module):
             mets = self._expl_behavior.train(start, context, data)[-1]
             metrics.update({"expl_" + key: value for key, value in mets.items()})
         for name, value in metrics.items():
-            if not name in self._metrics.keys():
+            if name not in self._metrics.keys():
                 self._metrics[name] = [value]
             else:
                 self._metrics[name].append(value)
