@@ -1,21 +1,18 @@
-import datetime
 import collections
 import io
-import os
 import json
+import os
 import pathlib
-import re
-import time
 import random
+import time
 
+import imageio
 import numpy as np
-
 import torch
+from torch import distributions as torchd
 from torch import nn
 from torch.nn import functional as F
-from torch import distributions as torchd
 from torch.utils.tensorboard import SummaryWriter
-
 
 to_np = lambda x: x.detach().cpu().numpy()
 
@@ -217,13 +214,13 @@ def simulate(
 
                 if not is_eval:
                     step_in_dataset = erase_over_episodes(cache, limit)
-                    logger.scalar(f"dataset_size", step_in_dataset)
-                    logger.scalar(f"train_return", score)
-                    logger.scalar(f"train_length", length)
-                    logger.scalar(f"train_episodes", len(cache))
+                    logger.scalar("dataset_size", step_in_dataset)
+                    logger.scalar("train_return", score)
+                    logger.scalar("train_length", length)
+                    logger.scalar("train_episodes", len(cache))
                     logger.write(step=logger.step)
                 else:
-                    if not "eval_lengths" in locals():
+                    if "eval_lengths" not in locals():
                         eval_lengths = []
                         eval_scores = []
                         eval_done = False
@@ -233,12 +230,12 @@ def simulate(
 
                     score = sum(eval_scores) / len(eval_scores)
                     length = sum(eval_lengths) / len(eval_lengths)
-                    logger.video(f"eval_policy", np.array(video)[None])
+                    logger.video("eval_policy", np.array(video)[None])
 
                     if len(eval_scores) >= episodes and not eval_done:
-                        logger.scalar(f"eval_return", score)
-                        logger.scalar(f"eval_length", length)
-                        logger.scalar(f"eval_episodes", len(eval_scores))
+                        logger.scalar("eval_return", score)
+                        logger.scalar("eval_length", length)
+                        logger.scalar("eval_episodes", len(eval_scores))
                         logger.write(step=logger.step)
                         eval_done = True
     if is_eval:
@@ -998,3 +995,20 @@ def recursively_load_optim_state_dict(obj, optimizers_state_dicts):
         for key in keys:
             obj_now = getattr(obj_now, key)
         obj_now.load_state_dict(state_dict)
+
+
+def episode_to_gif(filename, output_filename):
+    directory = pathlib.Path(filename).expanduser()
+    with directory.open("rb") as f:
+        episode = np.load(f)
+        episode = {k: episode[k] for k in episode.keys()}
+
+    images = episode["image"]
+    imageio.mimsave(output_filename, images, fps=10)
+
+
+if __name__ == "__main__":
+    episode_to_gif(
+        "logdir/dmc_walker_walk/eval_eps/20251205T144207-e671853687f346d8877e802e1828ef3a-501.npz",
+        "walker_walk.gif",
+    )
