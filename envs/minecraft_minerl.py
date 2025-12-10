@@ -1,20 +1,16 @@
+import os
+import pathlib
+import re
+
+import minerl
 from minerl.herobraine.env_spec import EnvSpec
-from minerl.herobraine.hero import handler
-from minerl.herobraine.hero import handlers
-from minerl.herobraine.hero import mc
+from minerl.herobraine.hero import handler, handlers, mc
 from minerl.herobraine.hero.mc import INVERSE_KEYMAP
 
 
 def edit_options(**kwargs):
-    import os, pathlib, re
-
-    for word in os.popen("pip3 --version").read().split(" "):
-        if "-packages/pip" in word:
-            break
-    else:
-        raise RuntimeError("Could not found python package directory.")
-    packages = pathlib.Path(word).parent
-    filename = packages / "minerl/Malmo/Minecraft/run/options.txt"
+    minerl_dir = os.path.dirname(minerl.__file__)
+    filename = pathlib.Path(minerl_dir) / "Malmo/Minecraft/run/options.txt"
     options = filename.read_text()
     if "fovEffectScale:" not in options:
         options += "fovEffectScale:1.0\n"
