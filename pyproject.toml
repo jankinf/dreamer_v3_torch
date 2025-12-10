@@ -11,7 +11,7 @@ dependencies = [
     "dm-control==1.0.9",
     "einops==0.3.0",
     "gym>=0.23.1",
-    "matplotlib==3.5.0",
+    "matplotlib==3.8.4",
     "memory-maze==1.0.3",
     "minerl-mirror",
     "moviepy==1.0.3",
