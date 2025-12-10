@@ -356,4 +356,5 @@ if __name__ == "__main__":
     for key, value in sorted(defaults.items(), key=lambda x: x[0]):
         arg_type = tools.args_type(value)
         parser.add_argument(f"--{key}", type=arg_type, default=arg_type(value))
-    main(parser.parse_args(remaining))
+    args = parser.parse_args(remaining)
+    main(args)
