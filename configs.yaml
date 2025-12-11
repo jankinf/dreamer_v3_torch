@@ -130,6 +130,7 @@ crafter:
   imag_gradient: 'reinforce'
 
 atari100k:
+  task: 'atari_Pong'
   steps: 4e5
   envs: 1
   action_repeat: 4
