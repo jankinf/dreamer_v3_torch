@@ -202,7 +202,8 @@ class Atari:
         if len(action.shape) >= 1:
             action = np.argmax(action)
         for repeat in range(self._repeat):
-            _, reward, over, info = self._env.step(action)
+            _, reward, terminated, truncated, info = self._env.step(action)
+            over = terminated or truncated
             self._step += 1
             total += reward
             if repeat == self._repeat - 2:
@@ -229,7 +230,8 @@ class Atari:
         self._env.reset()
         if self._noops:
             for _ in range(self._random.randint(self._noops)):
-                _, _, dead, _ = self._env.step(0)
+                _, _, terminated, truncated, _ = self._env.step(0)
+                dead = terminated or truncated
                 if dead:
                     self._env.reset()
         self._last_lives = self._ale.lives()
@@ -265,7 +267,7 @@ class Atari:
         )
 
     def _screen(self, array):
-        self._ale.getScreenRGB2(array)
+        self._ale.getScreenRGB(array)
 
     def close(self):
         return self._env.close()
